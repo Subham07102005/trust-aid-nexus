@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as ClaimsRouteImport } from './routes/claims'
 import { Route as EvidenceRouteImport } from './routes/evidence'
+import { Route as ResilienceRouteImport } from './routes/resilience'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaimsRoute = ClaimsRouteImport.update({
@@ -28,6 +35,11 @@ const ClaimsRoute = ClaimsRouteImport.update({
 const EvidenceRoute = EvidenceRouteImport.update({
   id: '/evidence',
   path: '/evidence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResilienceRoute = ResilienceRouteImport.update({
+  id: '/resilience',
+  path: '/resilience',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
@@ -43,39 +55,68 @@ const EventsEventIdRoute = EventsEventIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/claims': typeof ClaimsRoute
   '/evidence': typeof EvidenceRoute
+  '/resilience': typeof ResilienceRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/': typeof EventsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/claims': typeof ClaimsRoute
   '/evidence': typeof EvidenceRoute
+  '/resilience': typeof ResilienceRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events': typeof EventsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/claims': typeof ClaimsRoute
   '/evidence': typeof EvidenceRoute
+  '/resilience': typeof ResilienceRoute
   '/events/$eventId': typeof EventsEventIdRoute
   '/events/': typeof EventsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/claims' | '/evidence' | '/events/$eventId' | '/events/'
+  fullPaths:
+    | '/'
+    | '/analytics'
+    | '/claims'
+    | '/evidence'
+    | '/resilience'
+    | '/events/$eventId'
+    | '/events/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/claims' | '/evidence' | '/events/$eventId' | '/events'
+  to:
+    | '/'
+    | '/analytics'
+    | '/claims'
+    | '/evidence'
+    | '/resilience'
+    | '/events/$eventId'
+    | '/events'
   id:
-    '__root__' | '/' | '/claims' | '/evidence' | '/events/$eventId' | '/events/'
+    | '__root__'
+    | '/'
+    | '/analytics'
+    | '/claims'
+    | '/evidence'
+    | '/resilience'
+    | '/events/$eventId'
+    | '/events/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   ClaimsRoute: typeof ClaimsRoute
   EvidenceRoute: typeof EvidenceRoute
+  ResilienceRoute: typeof ResilienceRoute
   EventsEventIdRoute: typeof EventsEventIdRoute
   EventsIndexRoute: typeof EventsIndexRoute
 }
@@ -87,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/claims': {
@@ -101,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/evidence'
       fullPath: '/evidence'
       preLoaderRoute: typeof EvidenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resilience': {
+      id: '/resilience'
+      path: '/resilience'
+      fullPath: '/resilience'
+      preLoaderRoute: typeof ResilienceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/': {
@@ -122,8 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
   ClaimsRoute: ClaimsRoute,
   EvidenceRoute: EvidenceRoute,
+  ResilienceRoute: ResilienceRoute,
   EventsEventIdRoute: EventsEventIdRoute,
   EventsIndexRoute: EventsIndexRoute,
 }
