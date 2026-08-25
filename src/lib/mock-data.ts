@@ -25,6 +25,8 @@ export interface DisasterEvent {
   updatedAgo: string;
   summary: string;
   coords: { x: number; y: number };
+  /** Real-world location used for the event map. */
+  geo: { lat: number; lng: number };
   timeline: { time: string; label: string; kind: "info" | "warn" | "alert" | "official" }[];
   claimIds: string[];
 }
