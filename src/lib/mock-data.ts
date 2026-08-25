@@ -25,6 +25,8 @@ export interface DisasterEvent {
   updatedAgo: string;
   summary: string;
   coords: { x: number; y: number };
+  /** Real-world location used for the event map. */
+  geo: { lat: number; lng: number };
   timeline: { time: string; label: string; kind: "info" | "warn" | "alert" | "official" }[];
   claimIds: string[];
 }
@@ -77,6 +79,7 @@ export const events: DisasterEvent[] = [
     summary:
       "Rising water levels reported across several wards. Information volume is increasing faster than official confirmations, which raises the chance of unverified claims spreading.",
     coords: { x: 68, y: 34 },
+    geo: { lat: 27.4728, lng: 94.912 },
     timeline: [
       { time: "08:00", label: "Heavy rainfall reports appear", kind: "info" },
       { time: "09:15", label: "Flood-related claims increase", kind: "warn" },
@@ -99,6 +102,7 @@ export const events: DisasterEvent[] = [
     summary:
       "Slope instability reported along hill sections after sustained rainfall. Several road-closure claims are circulating with conflicting details.",
     coords: { x: 42, y: 58 },
+    geo: { lat: 25.1667, lng: 93.0167 },
     timeline: [
       { time: "06:40", label: "Slope movement reported by residents", kind: "info" },
       { time: "07:55", label: "Road-closure claims appear", kind: "warn" },
@@ -120,6 +124,7 @@ export const events: DisasterEvent[] = [
     summary:
       "Water levels receding. Older photographs from previous years are being re-shared as current, creating context confusion.",
     coords: { x: 22, y: 40 },
+    geo: { lat: 26.3225, lng: 91.006 },
     timeline: [
       { time: "05:10", label: "Water level decline recorded", kind: "info" },
       { time: "08:20", label: "Archived flood photographs re-shared", kind: "warn" },
