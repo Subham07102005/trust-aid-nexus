@@ -118,23 +118,21 @@ function EventDetail() {
             <CardTitle className="text-base">Event map</CardTitle>
           </CardHeader>
           <CardContent>
-            <div
-              role="img"
-              aria-label={`Simplified map placeholder showing the event location in ${event.region}`}
-              className="relative h-64 w-full overflow-hidden rounded-md border border-border bg-surface"
-            >
-              <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] [background-size:32px_32px]" />
-              <span
-                className="absolute size-3 rounded-full bg-critical ring-4 ring-critical/20"
-                style={{ left: `${event.coords.x}%`, top: `${event.coords.y}%` }}
+            <div className="relative h-64 w-full overflow-hidden rounded-md border border-border bg-surface">
+              <iframe
+                title={`Map showing the event location in ${event.region}`}
+                loading="lazy"
+                className="h-full w-full border-0"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${event.geo.lng - 0.35}%2C${event.geo.lat - 0.25}%2C${event.geo.lng + 0.35}%2C${event.geo.lat + 0.25}&layer=mapnik&marker=${event.geo.lat}%2C${event.geo.lng}`}
               />
-              <span className="absolute bottom-3 left-3 rounded bg-card px-2 py-1 text-xs font-medium text-foreground">
+              <span className="pointer-events-none absolute bottom-3 left-3 rounded bg-card px-2 py-1 text-xs font-medium text-foreground">
                 {event.region}
               </span>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Simplified location placeholder. Evidence locations and environmental sensor markers
-              will appear here when those data sources are connected.
+              Approximate event location ({event.geo.lat.toFixed(4)}, {event.geo.lng.toFixed(4)}).
+              Evidence locations and environmental sensor markers will appear here when those data
+              sources are connected.
             </p>
           </CardContent>
         </Card>
