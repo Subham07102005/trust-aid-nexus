@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MeterBar, PageHeader, StatusPill, claimStatusTone, riskTone } from "@/components/status";
 import { claims, dashboardStats, events, environmentalSignals } from "@/lib/mock-data";
-import { Activity, MapPin, Clock } from "lucide-react";
+import { Activity, MapPin, Clock, Waves, Mountain, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
