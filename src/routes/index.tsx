@@ -51,9 +51,9 @@ function Dashboard() {
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {dashboardStats.map((s) => (
-            <Card key={s.label}>
-              <CardContent className="pt-6">
-                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <Card key={s.label} className="shadow-xs">
+              <CardContent className="pt-5">
+                <p className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
                   {s.label}
                 </p>
                 <p className="mt-2 font-mono text-3xl font-bold tabular-nums text-foreground">
@@ -67,42 +67,50 @@ function Dashboard() {
       </section>
 
       <section aria-labelledby="events-heading">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 id="events-heading" className="text-lg font-semibold text-foreground">
+        <div className="mb-3 flex items-center justify-between border-b border-border pb-2">
+          <h2 id="events-heading" className="text-base font-semibold tracking-tight text-foreground">
             Active events
           </h2>
-          <Link to="/events" className="text-sm font-medium text-primary hover:underline">
-            View all events
+          <Link
+            to="/events"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
+            View all events <ArrowRight aria-hidden="true" className="size-3.5" />
           </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {events.map((e) => (
-            <Card key={e.id}>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <span aria-hidden="true">{e.type === "Flood" ? "🌊" : "🏔"}</span>
-                  {e.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  <StatusPill label={e.status} tone={e.status === "Developing" ? "warning" : "info"} />
-                  <StatusPill label={`Risk: ${e.risk}`} tone={riskTone(e.risk)} />
-                </div>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin aria-hidden="true" className="size-4" /> {e.location}
-                </p>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock aria-hidden="true" className="size-4" /> Updated {e.updatedAgo}
-                </p>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/events/$eventId" params={{ eventId: e.id }}>
-                    View event
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {events.map((e) => {
+            const TypeIcon = e.type === "Flood" ? Waves : Mountain;
+            return (
+              <Card key={e.id} className="shadow-xs">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2.5 text-base">
+                    <span className="flex size-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                      <TypeIcon aria-hidden="true" className="size-4" />
+                    </span>
+                    {e.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    <StatusPill label={e.status} tone={e.status === "Developing" ? "warning" : "info"} />
+                    <StatusPill label={`Risk: ${e.risk}`} tone={riskTone(e.risk)} />
+                  </div>
+                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin aria-hidden="true" className="size-4" /> {e.location}
+                  </p>
+                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock aria-hidden="true" className="size-4" /> Updated {e.updatedAgo}
+                  </p>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/events/$eventId" params={{ eventId: e.id }}>
+                      View event
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
