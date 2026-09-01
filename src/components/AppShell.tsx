@@ -10,6 +10,7 @@ import {
   Network,
   Menu,
   X,
+  Radar,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -27,14 +28,14 @@ const nav = [
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <nav aria-label="Main" className="flex flex-col gap-1">
+    <nav aria-label="Main" className="flex flex-col gap-0.5">
       {nav.map(({ to, label, icon: Icon }) => (
         <Link
           key={to}
           to={to}
           onClick={onNavigate}
           activeOptions={{ exact: to === "/" }}
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
           activeProps={{
             className: "bg-sidebar-accent text-sidebar-accent-foreground font-semibold",
           }}
@@ -47,14 +48,32 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function Brand() {
+function Brand({ dark }: { dark?: boolean }) {
   return (
-    <Link to="/" className="block focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
-      <span className="block text-base font-bold tracking-tight text-foreground">
-        SATYA IMMUNE X
+    <Link
+      to="/"
+      className="flex items-center gap-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+    >
+      <span
+        className={cn(
+          "flex size-9 items-center justify-center rounded-md",
+          dark ? "bg-sidebar-primary text-sidebar-primary-foreground" : "bg-primary text-primary-foreground",
+        )}
+      >
+        <Radar aria-hidden="true" className="size-5" />
       </span>
-      <span className="block text-xs text-muted-foreground">
-        Disaster Information Intelligence
+      <span>
+        <span
+          className={cn(
+            "block text-sm font-bold tracking-tight",
+            dark ? "text-sidebar-accent-foreground" : "text-foreground",
+          )}
+        >
+          SATYA IMMUNE X
+        </span>
+        <span className={cn("block text-xs", dark ? "text-sidebar-foreground/70" : "text-muted-foreground")}>
+          Disaster Information Intelligence
+        </span>
       </span>
     </Link>
   );
