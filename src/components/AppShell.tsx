@@ -10,6 +10,7 @@ import {
   Network,
   Menu,
   X,
+  Radar,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -27,14 +28,14 @@ const nav = [
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <nav aria-label="Main" className="flex flex-col gap-1">
+    <nav aria-label="Main" className="flex flex-col gap-0.5">
       {nav.map(({ to, label, icon: Icon }) => (
         <Link
           key={to}
           to={to}
           onClick={onNavigate}
           activeOptions={{ exact: to === "/" }}
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
           activeProps={{
             className: "bg-sidebar-accent text-sidebar-accent-foreground font-semibold",
           }}
@@ -47,14 +48,32 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function Brand() {
+function Brand({ dark }: { dark?: boolean }) {
   return (
-    <Link to="/" className="block focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
-      <span className="block text-base font-bold tracking-tight text-foreground">
-        SATYA IMMUNE X
+    <Link
+      to="/"
+      className="flex items-center gap-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+    >
+      <span
+        className={cn(
+          "flex size-9 items-center justify-center rounded-md",
+          dark ? "bg-sidebar-primary text-sidebar-primary-foreground" : "bg-primary text-primary-foreground",
+        )}
+      >
+        <Radar aria-hidden="true" className="size-5" />
       </span>
-      <span className="block text-xs text-muted-foreground">
-        Disaster Information Intelligence
+      <span>
+        <span
+          className={cn(
+            "block text-sm font-bold tracking-tight",
+            dark ? "text-sidebar-accent-foreground" : "text-foreground",
+          )}
+        >
+          SATYA IMMUNE X
+        </span>
+        <span className={cn("block text-xs", dark ? "text-sidebar-foreground/70" : "text-muted-foreground")}>
+          Disaster Information Intelligence
+        </span>
       </span>
     </Link>
   );
@@ -67,21 +86,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background">
       <div
         role="note"
-        className="flex items-center justify-center gap-2 border-b border-warning/30 bg-warning-soft px-4 py-1.5 text-center text-xs font-medium text-foreground"
+        className="flex items-center justify-center gap-2 border-b border-warning/25 bg-warning-soft px-4 py-1.5 text-center text-xs font-medium text-foreground"
       >
-        <span className="rounded-sm bg-warning px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-warning-foreground uppercase">
+        <span className="rounded-sm bg-warning px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-warning-foreground uppercase">
           Demo data
         </span>
         <span>Prototype for research and demonstration — not a live emergency service.</span>
       </div>
 
       <div className="mx-auto flex w-full max-w-[1400px]">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-sidebar-border bg-sidebar px-4 py-5 lg:block">
-          <Brand />
-          <div className="mt-6">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-sidebar px-4 py-5 lg:block">
+          <Brand dark />
+          <div className="mt-8">
             <NavList />
           </div>
-          <p className="mt-8 border-t border-sidebar-border pt-4 text-xs leading-relaxed text-muted-foreground">
+          <p className="mt-8 border-t border-sidebar-border pt-4 text-xs leading-relaxed text-sidebar-foreground/70">
             AI assessments are estimates. Always confirm emergency instructions with the relevant
             official authority.
           </p>

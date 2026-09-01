@@ -1,22 +1,23 @@
 import { cn } from "@/lib/utils";
 import type { ClaimStatus, RiskLevel } from "@/lib/mock-data";
+import { Check, TriangleAlert, OctagonAlert, Info, Minus } from "lucide-react";
 
 type Tone = "success" | "warning" | "critical" | "info" | "neutral";
 
 const toneClass: Record<Tone, string> = {
-  success: "bg-success-soft text-success border-success/30",
-  warning: "bg-warning-soft text-warning border-warning/30",
-  critical: "bg-critical-soft text-critical border-critical/30",
-  info: "bg-info-soft text-info border-info/30",
+  success: "bg-success-soft text-success border-success/25",
+  warning: "bg-warning-soft text-warning border-warning/25",
+  critical: "bg-critical-soft text-critical border-critical/25",
+  info: "bg-info-soft text-info border-info/25",
   neutral: "bg-neutral-soft text-muted-foreground border-border",
 };
 
-const toneSymbol: Record<Tone, string> = {
-  success: "✓",
-  warning: "!",
-  critical: "▲",
-  info: "i",
-  neutral: "—",
+const toneIcon: Record<Tone, typeof Check> = {
+  success: Check,
+  warning: TriangleAlert,
+  critical: OctagonAlert,
+  info: Info,
+  neutral: Minus,
 };
 
 export function StatusPill({
@@ -28,17 +29,16 @@ export function StatusPill({
   tone: Tone;
   className?: string;
 }) {
+  const Icon = toneIcon[tone];
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
+        "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-semibold tracking-wide",
         toneClass[tone],
         className,
       )}
     >
-      <span aria-hidden="true" className="font-mono text-[10px]">
-        {toneSymbol[tone]}
-      </span>
+      <Icon aria-hidden="true" className="size-3" strokeWidth={2.5} />
       {label}
     </span>
   );
