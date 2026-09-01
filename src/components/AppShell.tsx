@@ -86,21 +86,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background">
       <div
         role="note"
-        className="flex items-center justify-center gap-2 border-b border-warning/30 bg-warning-soft px-4 py-1.5 text-center text-xs font-medium text-foreground"
+        className="flex items-center justify-center gap-2 border-b border-warning/25 bg-warning-soft px-4 py-1.5 text-center text-xs font-medium text-foreground"
       >
-        <span className="rounded-sm bg-warning px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-warning-foreground uppercase">
+        <span className="rounded-sm bg-warning px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-warning-foreground uppercase">
           Demo data
         </span>
         <span>Prototype for research and demonstration — not a live emergency service.</span>
       </div>
 
       <div className="mx-auto flex w-full max-w-[1400px]">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-sidebar-border bg-sidebar px-4 py-5 lg:block">
-          <Brand />
-          <div className="mt-6">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-sidebar px-4 py-5 lg:block">
+          <Brand dark />
+          <div className="mt-8">
             <NavList />
           </div>
-          <p className="mt-8 border-t border-sidebar-border pt-4 text-xs leading-relaxed text-muted-foreground">
+          <p className="mt-8 border-t border-sidebar-border pt-4 text-xs leading-relaxed text-sidebar-foreground/70">
             AI assessments are estimates. Always confirm emergency instructions with the relevant
             official authority.
           </p>
