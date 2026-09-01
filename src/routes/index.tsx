@@ -115,16 +115,19 @@ function Dashboard() {
       </section>
 
       <section aria-labelledby="priority-heading" className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="shadow-xs lg:col-span-2">
           <CardHeader>
             <CardTitle id="priority-heading" className="text-base">
               Highest-priority claims
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             {priorityClaims.map((c) => (
-              <div key={c.id} className="rounded-md border border-border p-4">
-                <p className="text-sm leading-relaxed text-foreground">{c.text}</p>
+              <div
+                key={c.id}
+                className="rounded-md border border-border bg-surface/60 p-4 transition-colors hover:bg-surface"
+              >
+                <p className="text-sm leading-relaxed font-medium text-foreground">{c.text}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <StatusPill label={c.status} tone={claimStatusTone(c.status)} />
                   <StatusPill label={`Risk: ${c.informationRisk}`} tone={riskTone(c.informationRisk)} />
@@ -134,9 +137,9 @@ function Dashboard() {
                   <Link
                     to="/evidence"
                     search={{ claim: c.id }}
-                    className="ml-auto text-sm font-medium text-primary hover:underline"
+                    className="ml-auto inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                   >
-                    View evidence
+                    View evidence <ArrowRight aria-hidden="true" className="size-3.5" />
                   </Link>
                 </div>
               </div>
@@ -144,7 +147,7 @@ function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-xs">
           <CardHeader>
             <CardTitle className="text-base">Environmental evidence</CardTitle>
           </CardHeader>
