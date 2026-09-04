@@ -29,6 +29,12 @@ class Claim(Base, TimestampMixin):
     event_id: Mapped[int | None] = mapped_column(
         ForeignKey("events.id", ondelete="CASCADE"), index=True
     )
+    post_id: Mapped[int | None] = mapped_column(
+        ForeignKey("posts.id", ondelete="CASCADE"), index=True
+    )
+    cluster_id: Mapped[int | None] = mapped_column(
+        ForeignKey("claim_clusters.id", ondelete="SET NULL"), index=True
+    )
 
     claim_text: Mapped[str] = mapped_column(Text, nullable=False)
     claim_type: Mapped[str] = mapped_column(String(40), nullable=False, default="other")
@@ -63,6 +69,13 @@ class Claim(Base, TimestampMixin):
     model_version: Mapped[str | None] = mapped_column(String(50))
 
     event: Mapped["Event | None"] = relationship(back_populates="claims")
+    post: Mapped["Post | None"] = relationship(back_populates="claims")
+    cluster: Mapped["ClaimCluster | None"] = relationship(
+        back_populates="claims", foreign_keys=[cluster_id]
+    )
+    evidence_items: Mapped[list["Evidence"]] = relationship(
+        back_populates="claim", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         CheckConstraint(f"disaster_type IN {DISASTER_TYPES}", name="claim_disaster_type_valid"),
