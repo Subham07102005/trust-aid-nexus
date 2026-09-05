@@ -29,6 +29,9 @@ class Evidence(Base, TimestampMixin):
     content: Mapped[str | None] = mapped_column(Text)
     url: Mapped[str | None] = mapped_column(Text)
     content_hash: Mapped[str | None] = mapped_column(String(64), index=True)
+    derived_from_evidence_id: Mapped[int | None] = mapped_column(
+        ForeignKey("evidence.id", ondelete="SET NULL"), index=True
+    )
 
     # How this evidence relates to the claim, and how much it counts.
     relation: Mapped[str] = mapped_column(String(30), nullable=False, default="unrelated")
@@ -46,6 +49,9 @@ class Evidence(Base, TimestampMixin):
 
     claim: Mapped["Claim"] = relationship(back_populates="evidence_items")
     source: Mapped["Source"] = relationship()
+    derived_from: Mapped["Evidence | None"] = relationship(
+        "Evidence", remote_side=[id]
+    )
 
     __table_args__ = (
         CheckConstraint(f"evidence_type IN {EVIDENCE_TYPES}", name="evidence_type_valid"),
