@@ -50,6 +50,9 @@ class Claim(Base, TimestampMixin):
     event_time: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), index=True
     )
+    last_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), index=True
+    )
     time_precision: Mapped[str] = mapped_column(
         String(20), nullable=False, default="unknown"
     )
@@ -75,6 +78,13 @@ class Claim(Base, TimestampMixin):
     )
     evidence_items: Mapped[list["Evidence"]] = relationship(
         back_populates="claim", cascade="all, delete-orphan"
+    )
+    reasons: Mapped[list["ClaimReason"]] = relationship(
+        back_populates="claim", cascade="all, delete-orphan",
+        order_by="ClaimReason.position",
+    )
+    signals: Mapped[list["ManipulationSignal"]] = relationship(
+        back_populates="claim", cascade="all, delete-orphan",
     )
 
     __table_args__ = (
