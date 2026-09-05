@@ -40,6 +40,10 @@ class Event(Base, TimestampMixin):
     claims: Mapped[list["Claim"]] = relationship(
         back_populates="event", cascade="all, delete-orphan"
     )
+    timeline: Mapped[list["EventTimelineEntry"]] = relationship(
+        back_populates="event", cascade="all, delete-orphan",
+        order_by="EventTimelineEntry.occurred_at",
+    )
     __table_args__ = (
         CheckConstraint(f"event_type IN {EVENT_TYPES}", name="event_type_valid"),
         CheckConstraint(f"status IN {EVENT_STATUSES}", name="event_status_valid"),
