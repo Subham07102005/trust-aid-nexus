@@ -1,22 +1,11 @@
-"""Load prototype demo data into the database as real rows.
-
-Every value here is transcribed from src/lib/mock-data.ts. Nothing is invented.
-That is what makes this a valid test of the schema: where the transcription
-could not be completed, the gap is a real schema gap, recorded in the notes at
-the bottom of this file rather than papered over with plausible-looking data.
-
-Safe to re-run: it clears the tables it populates first.
-"""
-
 from datetime import datetime, timezone
 
 from satya_api.db import SessionLocal
 from satya_api.models import (
-    Claim, Event, Evidence, Intervention, Post, RiskAssessment, Source,
+    Claim, ClaimReason, Event, EventTimelineEntry, Evidence, Intervention,
+    ManipulationSignal, Post, RiskAssessment, Source,
 )
 
-# All prototype timestamps are wall-clock times with no date attached
-# ("10:45", "09:00"). They are anchored to a single demo day here.
 DEMO_DAY = (2026, 6, 14)
 
 
@@ -27,13 +16,13 @@ def utc(hh, mm, day=None):
 
 session = SessionLocal()
 
-for model in (Evidence, RiskAssessment, Claim, Post, Event, Intervention, Source):
+for model in (
+    ClaimReason, ManipulationSignal, Evidence, RiskAssessment,
+    EventTimelineEntry, Claim, Post, Event, Intervention, Source,
+):
     session.query(model).delete()
 session.commit()
 
-# ---------------------------------------------------------------- sources ---
-# One row per distinct evidence origin named in mock-data.ts. Reliability
-# scores follow the prototype's High / Medium / Low / Unknown labels.
 
 asdma = Source(
     name="State Disaster Management Authority",
@@ -141,13 +130,35 @@ barpeta = Event(
 session.add_all([dibrugarh, dima_hasao, barpeta])
 session.flush()
 
-# ----------------------------------------------------------------- claims ---
-# confidence_low / confidence_high are left NULL: the prototype supplies a
-# single number with no interval, and inventing one would be fabrication.
 
-# c-201. Prototype status was "High Information Risk" — a risk level occupying
-# a verification field. It splits across three columns here, which is the whole
-# reason the schema separates the two axes.
+session.add_all([
+    EventTimelineEntry(event=dibrugarh, occurred_at=utc(8, 0),
+                       label="Heavy rainfall reports appear", kind="info"),
+    EventTimelineEntry(event=dibrugarh, occurred_at=utc(9, 15),
+                       label="Flood-related claims increase", kind="warn"),
+    EventTimelineEntry(event=dibrugarh, occurred_at=utc(10, 5),
+                       label="Environmental anomaly detected", kind="warn"),
+    EventTimelineEntry(event=dibrugarh, occurred_at=utc(11, 20),
+                       label="Official warning published", kind="official"),
+    EventTimelineEntry(event=dibrugarh, occurred_at=utc(12, 10),
+                       label="False evacuation claim begins spreading", kind="alert"),
+
+    EventTimelineEntry(event=dima_hasao, occurred_at=utc(6, 40),
+                       label="Slope movement reported by residents", kind="info"),
+    EventTimelineEntry(event=dima_hasao, occurred_at=utc(7, 55),
+                       label="Road-closure claims appear", kind="warn"),
+    EventTimelineEntry(event=dima_hasao, occurred_at=utc(9, 30),
+                       label="Local news reports partial blockage", kind="info"),
+    EventTimelineEntry(event=dima_hasao, occurred_at=utc(10, 45),
+                       label="Conflicting reopening claims circulate", kind="alert"),
+
+    EventTimelineEntry(event=barpeta, occurred_at=utc(5, 10),
+                       label="Water level decline recorded", kind="info"),
+    EventTimelineEntry(event=barpeta, occurred_at=utc(8, 20),
+                       label="Archived flood photographs re-shared", kind="warn"),
+])
+
+
 c201 = Claim(
     event=dibrugarh,
     claim_text="All residents of Dibrugarh have been ordered to evacuate immediately.",
@@ -161,6 +172,7 @@ c201 = Claim(
     confidence=0.84,
     information_risk="critical",
     potential_impact="critical",
+    last_verified_at=utc(12, 6),      # "4 minutes ago"
     model_version="seed-manual-v1",
 )
 
@@ -178,6 +190,7 @@ c202 = Claim(
     confidence=0.91,
     information_risk="low",
     potential_impact="medium",
+    last_verified_at=utc(11, 49),     # "21 minutes ago"
     model_version="seed-manual-v1",
 )
 
@@ -194,6 +207,7 @@ c203 = Claim(
     confidence=0.78,
     information_risk="high",
     potential_impact="high",
+    last_verified_at=utc(12, 1),      # "9 minutes ago"
     model_version="seed-manual-v1",
 )
 
@@ -210,6 +224,7 @@ c204 = Claim(
     confidence=0.73,
     information_risk="medium",
     potential_impact="medium",
+    last_verified_at=utc(11, 10),     # "1 hour ago"
     model_version="seed-manual-v1",
 )
 
@@ -219,6 +234,25 @@ session.flush()
 # --------------------------------------------------------------- evidence ---
 # relevance_score is not present in the prototype and is left NULL rather than
 # invented. reliability_score follows the prototype's per-item label.
+#
+# e8 and e9 are named variables because e9 derives from e8 — see below.
+
+e8 = Evidence(
+    claim=c202, source=wrd, evidence_type="bulletin",
+    title="Water resources department reading",
+    content="Gauge reading published at 09:00.",
+    relation="supports",
+    reliability_score=0.92, temporal_match=0.95, geographic_match=0.95,
+    observed_at=utc(9, 0), location_text="Dibrugarh",
+)
+e9 = Evidence(
+    claim=c202, source=local_news, evidence_type="news_article",
+    title="Local newspaper report",
+    content="Cites the same departmental reading.",
+    relation="supports",
+    reliability_score=0.58, temporal_match=0.90, geographic_match=0.90,
+    observed_at=utc(9, 40), location_text="Dibrugarh",
+)
 
 session.add_all([
     # --- c-201 (e-5, e-6, e-7) ---
@@ -248,24 +282,8 @@ session.add_all([
     ),
 
     # --- c-202 (e-8, e-9) ---
-    Evidence(
-        claim=c202, source=wrd, evidence_type="bulletin",
-        title="Water resources department reading",
-        content="Gauge reading published at 09:00.",
-        relation="supports",
-        reliability_score=0.92, temporal_match=0.95, geographic_match=0.95,
-        observed_at=utc(9, 0), location_text="Dibrugarh",
-    ),
-    Evidence(
-        claim=c202, source=local_news, evidence_type="news_article",
-        title="Local newspaper report",
-        content="Cites the same departmental reading.",
-        # This restates the gauge reading above; it observes nothing
-        # independently. See note 4 at the bottom of this file.
-        relation="supports",
-        reliability_score=0.58, temporal_match=0.90, geographic_match=0.90,
-        observed_at=utc(9, 40), location_text="Dibrugarh",
-    ),
+    e8,
+    e9,
 
     # --- c-203 (e-1, e-2, e-3; e-4 deliberately omitted — see note 5) ---
     Evidence(
@@ -315,10 +333,89 @@ session.add_all([
     ),
 ])
 
-# -------------------------------------------------------- risk assessments ---
-# Priority values are the prototype's display numbers. propagation_score maps
-# the prototype's categorical label: Slow 0.25 / Steady 0.50 / Rapid 0.85.
-# formula_version records that none of this was computed by a model.
+# flush() assigns database ids without committing, so e8.id exists below.
+session.flush()
+
+# The newspaper restates the gauge reading; it observes nothing independently.
+# Evidence fusion must count one observation here, not two.
+e9.derived_from_evidence_id = e8.id
+
+# ---------------------------------------------------------------- reasons ---
+# The lines rendered by the "Why this result?" panel. reason_kind classifies
+# each one so error analysis can later ask which kind of reasoning fails most.
+
+REASONS = {
+    c201: [
+        ("No matching announcement was found in official channels.", "evidence_absence"),
+        ("The claim uses absolute wording covering an entire district.", "linguistic"),
+        ("Similar wording has appeared in unrelated past events.", "linguistic"),
+        ("Sharing pattern grew unusually quickly within a short window.", "propagation"),
+    ],
+    c202: [
+        ("An official gauge reading matches the reported level.", "evidence_support"),
+        ("Two independent news reports describe the same measurement.", "evidence_support"),
+        ("Reported time and location are internally consistent.", "temporal"),
+    ],
+    c203: [
+        ("Supporting authoritative evidence is currently limited.", "evidence_absence"),
+        ("Multiple social reports mention the same claim.", "propagation"),
+        ("The location is relevant to a known landslide event.", "geographic"),
+        ("The claim contains strong certainty language.", "linguistic"),
+        ("Current evidence does not fully confirm complete road blockage.", "evidence_conflict"),
+    ],
+    c204: [
+        ("A visually similar image appears in older archives.", "temporal"),
+        ("Current water-level readings do not match the scene.", "evidence_conflict"),
+        ("Landmarks in the image belong to a different area.", "geographic"),
+    ],
+}
+
+for claim, rows in REASONS.items():
+    for i, (text, kind) in enumerate(rows):
+        session.add(ClaimReason(
+            claim=claim, text=text, reason_kind=kind,
+            position=i, generated_by="seed-manual-v1",
+        ))
+
+SIGNALS = {
+    c201: [
+        ("artificial_urgency", 94, "Immediate-action instruction."),
+        ("fake_authority", 88, "Claims an order without naming an issuer."),
+        ("emotional_language", 71, "Fear-based framing."),
+        ("evidence_conflict", 86, "Official bulletin disagrees."),
+        ("context_inconsistency", 64, "Scope inconsistent with bulletin."),
+    ],
+    c202: [
+        ("artificial_urgency", 18, "Neutral wording."),
+        ("fake_authority", 9, "Source is named and traceable."),
+        ("emotional_language", 14, "Descriptive, not alarming."),
+        ("evidence_conflict", 11, "Sources agree."),
+        ("context_inconsistency", 16, "Time and place align."),
+    ],
+    c203: [
+        ("artificial_urgency", 82, "Time-pressure wording detected."),
+        ("fake_authority", 61, "References an unnamed 'official order'."),
+        ("emotional_language", 52, "Alarming adjectives above baseline."),
+        ("evidence_conflict", 91, "Sources disagree on the closure extent."),
+        ("context_inconsistency", 73, "Time references do not align."),
+    ],
+    c204: [
+        ("artificial_urgency", 44, "'Today' framing on old material."),
+        ("fake_authority", 21, "No authority cited."),
+        ("emotional_language", 58, "Distress-focused caption."),
+        ("evidence_conflict", 77, "Archive and gauge disagree."),
+        ("context_inconsistency", 89, "Date and place mismatch."),
+    ],
+}
+
+for claim, rows in SIGNALS.items():
+    for signal_type, value, note in rows:
+        session.add(ManipulationSignal(
+            claim=claim, signal_type=signal_type,
+            value=value / 100.0, note=note,
+            method_version="seed-manual-v1",
+        ))
+
 
 PLACEHOLDER = "seed-placeholder-v0"
 NOTE = "Seeded from prototype display values. Not computed by any model."
@@ -353,4 +450,7 @@ print(f"Events:   {session.query(Event).count()}")
 print(f"Claims:   {session.query(Claim).count()}")
 print(f"Evidence: {session.query(Evidence).count()}")
 print(f"Risk:     {session.query(RiskAssessment).count()}")
+print(f"Reasons:  {session.query(ClaimReason).count()}")
+print(f"Signals:  {session.query(ManipulationSignal).count()}")
+print(f"Timeline: {session.query(EventTimelineEntry).count()}")
 session.close()
